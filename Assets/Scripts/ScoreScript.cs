@@ -25,8 +25,5 @@ public class ScoreScript : MonoBehaviour
         SecondScore.text = $"Second : {MenuUI.Instance.secondName} : {MenuUI.Instance.secondScore}";
         ThirdScore.text = $"Third : {MenuUI.Instance.thirdName} : {MenuUI.Instance.thirdScore}";
     }
-    public void NewHighScore() //trying something else at the moment this script may be unnessecary.
-    {
-        
-    }
+
 }

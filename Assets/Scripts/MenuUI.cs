@@ -1,15 +1,20 @@
 using System.IO;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
+#if UNITY_EDITOR
+using UnityEditor;
+using TMPro;
+#endif
 
 
-
+[DefaultExecutionOrder(1000)]
 public class MenuUI : MonoBehaviour
 {
     public static MenuUI Instance;
     //all the score int's and player names condensed for readability.
     public int highScore; public int secondScore; public int thirdScore; public string topName; public string secondName; public string thirdName;
+    public int currentScore;
     public string currentPlayer; //for saving purposes
+    public TMP_Text topScore;
 
     private void Awake()
     {
@@ -23,10 +28,15 @@ public class MenuUI : MonoBehaviour
 
         LoadScore();
     }
-    public void ReadStringInput(string playerName)
+    public void Start()
     {
-        currentPlayer = playerName;
-        Debug.Log(currentPlayer);
+        LoadScore();
+    }
+    
+    public void ResetHighScore()
+    {
+        topScore = GameObject.Find("Top Score").GetComponent<TMP_Text>();
+        topScore.text = $"Top Score: Reset";
     }
     [System.Serializable]
     class SaveData
@@ -36,9 +46,9 @@ public class MenuUI : MonoBehaviour
     }
     public void SaveScore()
     {
-    SaveData[] data = new SaveData[6];
+        SaveData data = new SaveData();
         //all the variables top score 1,2,3 & playername 1,2,3
-        data[0].highScore = highScore; data[1].secondScore = secondScore; data[2].thirdScore = thirdScore; data[3].topName = topName; data[4].secondName = secondName; data[5].thirdName = thirdName;
+        data.highScore = highScore; data.secondScore = secondScore; data.thirdScore = thirdScore; data.topName = topName; data.secondName = secondName; data.thirdName = thirdName;
 
         string json = JsonUtility.ToJson(data);
 
@@ -50,11 +60,23 @@ public class MenuUI : MonoBehaviour
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);
-            SaveData[] data = JsonUtility.FromJson<SaveData[]>(json);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
 
             //all the variables top score 1,2,3 & playername 1,2,3 condensed to one line for readability.
-            highScore = data[0].highScore; secondScore = data[1].secondScore; thirdScore = data[2].thirdScore; topName = data[3].topName; secondName = data[4].secondName; thirdName = data[5].thirdName;
+            highScore = data.highScore; secondScore = data.secondScore; thirdScore = data.thirdScore; topName = data.topName; secondName = data.secondName; thirdName = data.thirdName;
+        Debug.Log (data);
+        } else
+        {
+            Debug.Log("file not found");
         }
     }
-
+    public void Exit()
+    {
+        SaveScore();
+#if UNITY_EDITOR
+        EditorApplication.ExitPlaymode();
+#else
+        Application.Quit();
+#endif
+    }
 }

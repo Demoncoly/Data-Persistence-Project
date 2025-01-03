@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -37,6 +35,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        HighScore.text = $"Top Score : {MenuUI.Instance.topName} : {MenuUI.Instance.highScore}";
     }
 
     private void Update()
@@ -67,24 +67,37 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        MenuUI.Instance.currentScore = m_Points;
+
+
     }
-    public void HighScoreOver()
-    {
-        if (m_Points > MenuUI.Instance.highScore && m_GameOver != true)
-        {
-            HighScore.text = $"Top Score : {MenuUI.Instance.currentPlayer} : {MenuUI.Instance.highScore}";
-        }
-    }
+
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
         if (m_Points > MenuUI.Instance.highScore)
         {
-            MenuUI.Instance.highScore = m_Points;
-            MenuUI.Instance.SaveScore();
-            HighScoreOver();
+            MenuUI.Instance.thirdScore = MenuUI.Instance.secondScore;
+            MenuUI.Instance.thirdName = MenuUI.Instance.secondName;
+            MenuUI.Instance.secondName = MenuUI.Instance.topName;
+            MenuUI.Instance.secondScore = MenuUI.Instance.highScore;
+            MenuUI.Instance.highScore = MenuUI.Instance.currentScore;
+            MenuUI.Instance.topName = MenuUI.Instance.currentPlayer;
         }
+        else if (m_Points > MenuUI.Instance.secondScore)
+        {
+            MenuUI.Instance.thirdScore = MenuUI.Instance.secondScore;
+            MenuUI.Instance.thirdName = MenuUI.Instance.secondName;
+            MenuUI.Instance.secondScore = MenuUI.Instance.currentScore;
+            MenuUI.Instance.secondName = MenuUI.Instance.currentPlayer;
+        }
+        else if (m_Points > MenuUI.Instance.thirdScore)
+        {
+            MenuUI.Instance.thirdScore = MenuUI.Instance.currentScore;
+            MenuUI.Instance.thirdName = MenuUI.Instance.currentPlayer;
+        }
+        MenuUI.Instance.SaveScore();
     }
     
 }
